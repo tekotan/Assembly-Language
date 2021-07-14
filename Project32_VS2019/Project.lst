@@ -1,0 +1,135 @@
+Microsoft (R) Macro Assembler Version 14.28.29336.0	    05/17/21 14:13:06
+addsum.asm						     Page 1 - 1
+
+
+				.586
+				.model flat,C
+
+				SumThreeArrays PROTO,
+					array1:PTR DWORD, array2:PTR DWORD, 
+					array3:PTR DWORD, arraySize:DWORD
+
+				AsmMultArray PROTO,
+					srchVal:DWORD, arrayPtr:PTR DWORD, arraySize:DWORD
+
+ 00000000			.code
+				;-----------------------------------------------
+ 00000000			SumThreeArrays PROC USES eax ebx esi,
+					array1:PTR DWORD, array2:PTR DWORD, 
+					array3:PTR DWORD, arraySize:DWORD
+				;-----------------------------------------------
+					LOCAL sz:BYTE		; local sz for jump
+ 00000000  55		   *	    push   ebp
+ 00000001  8B EC	   *	    mov    ebp, esp
+ 00000003  83 C4 FC	   *	    add    esp, 0FFFFFFFCh
+ 00000006  50		   *	    push   eax
+ 00000007  53		   *	    push   ebx
+ 00000008  56		   *	    push   esi
+ 00000009  C6 45 FF 04			mov sz, 4					; size of each iteration jump
+ 0000000D  8B 4D 14			mov ecx, arraySize			; set ecx to size of arrays for loop
+					
+ 00000010			L1:
+ 00000010  8B 45 14			mov eax, arraySize			; move array size into eax
+ 00000013  2B C1			sub eax, ecx				; subtract whats left
+ 00000015  F6 65 FF			mul sz						; multiply by 4 to know how much to jump
+					
+ 00000018  8B 75 08			mov esi, array1				; set esi to start of array 1
+ 0000001B  8B 1C 06			mov ebx, [esi+eax]			; move value of esi+jump into ebx
+					
+ 0000001E  8B 75 0C			mov esi, array2				; set esi to start of array 2
+ 00000021  03 1C 06			add ebx, [esi+eax]			; add value of esi+jump to ebx
+
+ 00000024  8B 75 10			mov esi, array3				; set esi to start of array 3
+ 00000027  03 1C 06			add ebx, [esi+eax]			; add value of esi+jump to ebx
+
+ 0000002A  8B 75 08			mov esi, array1				; set esi to start of array 1
+ 0000002D  89 1C 06			mov [esi+eax], ebx			; move value of ebx into esi+jump
+
+ 00000030  E2 DE			LOOP L1
+
+					ret  
+ 00000032  5E		   *	    pop    esi
+ 00000033  5B		   *	    pop    ebx
+ 00000034  58		   *	    pop    eax
+ 00000035  C9		   *	    leave  
+ 00000036  C3		   *	    ret    00000h
+ 00000037			SumThreeArrays ENDP
+
+ 00000037			AsmMultArray PROC USES edi,
+					mval:DWORD, arrayPtr:PTR DWORD, arraySize:DWORD
+				;
+				; Multiplies each element of an array by mval.
+				;-----------------------------------------------
+ 00000037  55		   *	    push   ebp
+ 00000038  8B EC	   *	    mov    ebp, esp
+ 0000003A  57		   *	    push   edi
+ 0000003B  60				pushad				; save registers
+
+ 0000003C  8B 75 0C			mov esi, arrayPtr	; set esi to address of array
+ 0000003F  8B 4D 10			mov ecx, arraySize	; set ecx to size of array for loop
+
+ 00000042			L1:
+ 00000042  8B 06			mov eax, [esi]		; move value into eax of current array element
+ 00000044  F7 65 08			mul mval			; multiply by value
+					;mov [esi], eax		; not requirement, but would move lower half of result back into memory
+ 00000047  83 C6 04			add esi, 4			; move esi
+
+ 0000004A  E2 F6			LOOP L1				; loop
+
+ 0000004C  61				popad				; return registers
+					ret   
+ 0000004D  5F		   *	    pop    edi
+ 0000004E  C9		   *	    leave  
+ 0000004F  C3		   *	    ret    00000h
+ 00000050			AsmMultArray ENDP
+
+				END
+Microsoft (R) Macro Assembler Version 14.28.29336.0	    05/17/21 14:13:06
+addsum.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000050 Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+AsmMultArray . . . . . . . . . .	P Near	 00000037 _TEXT	Length= 00000019 Public C
+  mval . . . . . . . . . . . . .	DWord	 bp + 00000008
+  arrayPtr . . . . . . . . . . .	DWord	 bp + 0000000C
+  arraySize  . . . . . . . . . .	DWord	 bp + 00000010
+  L1 . . . . . . . . . . . . . .	L Near	 00000042 _TEXT	
+SumThreeArrays . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000037 Public C
+  array1 . . . . . . . . . . . .	DWord	 bp + 00000008
+  array2 . . . . . . . . . . . .	DWord	 bp + 0000000C
+  array3 . . . . . . . . . . . .	DWord	 bp + 00000010
+  arraySize  . . . . . . . . . .	DWord	 bp + 00000014
+  sz . . . . . . . . . . . . . .	Byte	 bp - 00000001
+  L1 . . . . . . . . . . . . . .	L Near	 00000010 _TEXT	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000001h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+
+	   0 Warnings
+	   0 Errors

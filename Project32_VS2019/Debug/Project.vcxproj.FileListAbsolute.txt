@@ -1,0 +1,2 @@
+D:\Projects\Assembly Language\Project32_VS2019\Debug\Project.exe
+D:\Projects\Assembly Language\Project32_VS2019\Debug\Project.pdb
